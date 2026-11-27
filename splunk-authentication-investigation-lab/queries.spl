@@ -1,0 +1,13 @@
+# Sustituye YOUR_LAB_INDEX por el índice donde importaste el archivo.
+# Comprueba primero que source_ip, user, outcome y timestamp estén extraídos.
+
+index=YOUR_LAB_INDEX source="*authentication.jsonl*"
+| stats count by source_ip user outcome
+
+index=YOUR_LAB_INDEX source="*authentication.jsonl*"
+| sort 0 timestamp
+| table timestamp host source_ip user outcome
+
+index=YOUR_LAB_INDEX source="*authentication.jsonl*" outcome=failure
+| stats count by source_ip user
+| sort - count
