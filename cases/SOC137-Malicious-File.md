@@ -1,61 +1,20 @@
-# Incident Investigation Report: SOC137
+# SOC137 Malicious File Download Attempt
 
-## 📋 Executive Summary
-This report documents the detailed forensic analysis and incident response procedures performed for **SOC137 - Malicious File/Script Download Attempt** (Event ID: 76) on the [LetsDefend](https://app.letsdefend.io/monitoring) platform. The alert was successfully investigated, triaged, and closed as a **True Positive** within the predefined SLA.
+**LetsDefend training simulation · Event 76 · Medium severity**
 
----
+I closed this alert as a **true positive for an attempted download of a malicious document**. The alert recorded a block, and I initiated host containment as a precaution. Execution and impact on the endpoint remained unconfirmed.
 
-## 🔍 Incident Details
-| Parameter | Details |
-| :--- | :--- |
-| **Rule Name** | SOC137 - Malicious File/Script Download Attempt |
-| **Event ID** | 76 |
-| **Event Time** | 2021-03-14 19:15:52 +03:00 |
-| **Closed At** | 2026-10-29 02:38:22 UTC |
-| **Severity** | Medium |
-| **Type** | Malware |
-| **Result** | True Positive |
-| **MITRE ATT&CK** | [T1204 - User Execution](https://attack.mitre.org/techniques/T1204/) |
+## Investigation and decision
 
----
+| Step | Tool or source | Observation and reasoning |
+| --- | --- | --- |
+| Triage the alert | LetsDefend Monitoring | The alert associated a macro-enabled Word document with the endpoint and reported **Device Action: Blocked**. The alert did not identify the stage at which the block occurred. |
+| Check the file hash | VirusTotal | I looked up the MD5 supplied in the alert: **f2d0c66b801244c059f636d08a474079**. Multiple security engines flagged the file as malicious. These detections supported the true-positive verdict for the download attempt. |
+| Initiate host containment | LetsDefend Endpoint Security | I selected **Containment** for the affected endpoint as a precaution in the simulation. The resulting isolation status was not independently verified. |
+| Document the playbook result | LetsDefend playbook | I selected **Quarantined** for the malware-cleanup question based on the reported block. The file's quarantine status was not independently verified. |
 
-## 📦 Artifact Information
-* **File Name:** `INVOICE PACKAGE LINK TO DOWNLOAD.docm`
-* **File Size:** 16.66 Kb
-* **File Hash (MD5/SHA):** `f2d0c66b801244c059f636d08a474079`
-* **Source Hostname:** `NicolasPRD`
-* **Source Address:** `172.16.17.37`
-* **Device Action:** Blocked
+## Scope and follow-up
 
----
+The file-reputation results supported the alert classification. Determining whether the document executed or caused any impact would require additional endpoint evidence. The playbook recorded **Not Accessed** for the C2 check. That result alone does not confirm that a network control blocked a connection.
 
-## 🛠️ Playbook Execution & Results
-* **Check If Someone Requested the C2:** Not Accessed
-* **Analyze Malware:** Malicious
-* **Check if the malware is quarantined/cleaned:** Quarantined
-* **Playbook Score:** 15/15 (100% success rate)
-
----
-
-## 🕵️‍♂️ Investigation Methodology & Step-by-Step
-To reach the conclusion that this event was a **True Positive**, the following investigative steps were performed:
-
-1. **Alert Triage & Log Analysis:** 
-   * Reviewed endpoint telemetry and network logs for host `NicolasPRD` (`172.16.17.37`).
-   * Identified suspicious user activity involving an incoming macro-enabled Word document (`INVOICE PACKAGE LINK TO DOWNLOAD.docm`).
-2. **Artifact & Hash Investigation:** 
-   * Extracted and analyzed the file hash (`f2d0c66b801244c059f636d08a474079`).
-   * Confirmed indicators of compromise (IoCs) associated with phishing campaigns designed to trigger local script execution (MITRE T1204).
-3. **C2 & Network Verification:** 
-   * Checked proxy and firewall logs to verify if outbound connections or Command & Control (C2) requests were established. Result: *Not Accessed*.
-4. **Containment & Remediation Check:** 
-   * Verified via endpoint security tools that the EDR solution successfully blocked the execution and placed the file into quarantine.
-
----
-
-## 📝 Analyst Notes & Findings
-This incident represents a classic social engineering trap file (phishing/malspam) designed to exploit legacy Microsoft Office vulnerabilities when a user attempts to open what appears to be an urgent invoice or business document. 
-
-1. **Identification:** The alert triggered due to suspicious script execution attempts linked to an incoming macro-enabled Word document.
-2. **Containment:** Confirmed that network requests to potential C2 servers were blocked and the artifact was successfully quarantined on the endpoint (`NicolasPRD`).
-3. **Remediation:** Closed as a verified True Positive following standard incident response playbooks.
+[File reputation report](https://www.virustotal.com/gui/file/08d4fd5032b8b24072bdff43932630d4200f68404d7e12ffeeda2364c8158873/detection)
